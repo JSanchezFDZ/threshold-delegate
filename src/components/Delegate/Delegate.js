@@ -27,7 +27,7 @@ import Loader from "../Loader/Loader";
  * @param {string} address - The user's address.
  * @param {object} connector - The user's connector.
  * @author Jesús Sánchez Fernández | WWW.JSANCHEZFDZ.ES
- * @version 1.0.0
+ * @version 1.0.1
  */
 
 const Delegate = ({ address, connector }) => {
