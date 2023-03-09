@@ -1,5 +1,5 @@
 // React
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Utils
 import { ethers } from "ethers";
@@ -45,6 +45,8 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
     // ------------------------------ States --------------------------------- //
     const [delegateAddress, setDelegateAddress] = useState("");
     const [isValidAddress, setIsValidAddress] = useState(false);
+    const [ensName, setEnsName] = useState("");
+    const [isCheckingEnsName, setIsCheckingEnsName] = useState(false);
 
     // ---------------------------- Check address ---------------------------- //
 
@@ -57,11 +59,21 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
         }
     };
 
+    const setAndCheckAddress = (address) => {
+        setDelegateAddress(address);
+        checkAddress(address);
+    };
+
     // -------------------------- Handle functions -------------------------- //
     // Manual input
-    const handleInput = (e) => {
-        setDelegateAddress(e.target.value);
-        checkAddress(e.target.value);
+    const handleInput = async (e) => {
+        const value = e.target.value;
+
+        // Check if is ENS name
+        const isEnsName = value.includes(".eth");
+
+        if (isEnsName) setEnsName(isEnsName ? value : "");
+        else setAndCheckAddress(value);
     };
 
     // Delegate to myself
@@ -79,8 +91,25 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
 
     const handleDelegate = async () => {
         if (!isValidAddress) return;
-        await callToDelegate({ selectedStake, address: delegateAddress, toast, contract, onClose })
+        await callToDelegate({ selectedStake, address: delegateAddress, toast, contract, onClose });
     };
+
+    useEffect(() => {
+        const checkEnsName = async () => {
+            try {
+                setIsCheckingEnsName(true);
+                const resolverAddress = await contract.provider.resolveName(ensName);
+                setDelegateAddress(resolverAddress);
+                checkAddress(resolverAddress);
+                setEnsName("");
+                setIsCheckingEnsName(false);
+            } catch (error) {
+                setIsCheckingEnsName(false);
+                console.log("🚀 ~ file: ManualDelegate.js:108 ~ checkEnsName ~ error:", error);
+            }
+        };
+        ensName.includes(".eth") && checkEnsName();
+    }, [ensName, contract.provider]);
 
     // ------------------------------ Render ------------------------------ //
 
@@ -95,6 +124,11 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
                         Custom delegate
                     </Heading>
                     <Text textAlign="center">You can delegate to someone not listed, or to yourself</Text>
+                    {isCheckingEnsName && (
+                        <Text textAlign="center" mt={2}>
+                            Checking ENS name...
+                        </Text>
+                    )}
                     <Input
                         bgColor={bgColor}
                         my={4}
