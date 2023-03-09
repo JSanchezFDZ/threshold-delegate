@@ -35,7 +35,7 @@ const DelegateModal = ({ onClose, isOpen, selectedUser, selectedStake, balance, 
     const toast = useToast();
 
     const handleDelegate = async () => {
-        await callToDelegate({ selectedStake, selectedUser, toast, contract, onClose });
+        await callToDelegate({ selectedStake, address: selectedUser.address, toast, contract, onClose });
     };
 
     return (

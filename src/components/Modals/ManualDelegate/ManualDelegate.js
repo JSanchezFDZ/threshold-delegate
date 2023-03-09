@@ -51,7 +51,6 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
     const checkAddress = (address) => {
         try {
             const check = ethers.utils.isAddress(address);
-            console.log("🚀 ~ file: ManualDelegate.js:54 ~ checkAddress ~ check:", check)
             setIsValidAddress(check);
         } catch (error) {
             setIsValidAddress(false);
@@ -80,7 +79,7 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
 
     const handleDelegate = async () => {
         if (!isValidAddress) return;
-        await callToDelegate({ selectedStake, selectedUser: delegateAddress, toast, contract, onClose })
+        await callToDelegate({ selectedStake, address: delegateAddress, toast, contract, onClose })
     };
 
     // ------------------------------ Render ------------------------------ //

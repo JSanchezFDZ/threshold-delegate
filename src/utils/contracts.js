@@ -1,10 +1,10 @@
 import { errorToast, infoToast, successToast } from "./toastify";
 
-export const callToDelegate = async ({ selectedStake, selectedUser, toast, contract, onClose }) => {
+export const callToDelegate = async ({ selectedStake, address, toast, contract, onClose }) => {
     try {
         let tx;
-        if (selectedStake) tx = await contract.delegateVoting(selectedStake.idStake, selectedUser.address);
-        else tx = await contract.delegate(selectedUser.address);
+        if (selectedStake) tx = await contract.delegateVoting(selectedStake.idStake, address);
+        else tx = await contract.delegate(address);
         infoToast("Transaction sent", "Please wait for the transaction", toast);
         onClose();
         await tx.wait();
