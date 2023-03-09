@@ -118,7 +118,6 @@ const Delegate = ({ address, connector }) => {
                 // Convert foreach stake to ether
                 const auxStakes = [];
                 stakes.forEach((stake) => {
-                    console.log("🚀 ~ file: Delegate.js:128 ~ stakes.forEach ~ stake:", stake);
                     const stakeBigInt = BigInt(stake.totalStaked).toString();
                     const stakeEther = Number(ethers.utils.formatEther(stakeBigInt)).toFixed(0);
                     const delegatee = stake.delegatee?.id;
