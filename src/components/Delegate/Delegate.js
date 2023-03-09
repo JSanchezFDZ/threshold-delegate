@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 
 // Chakra UI
-import { Box, Button, Center, Heading, Spinner, Stack, Text, useColorModeValue, useDisclosure } from "@chakra-ui/react";
+import { Box, Center, Heading, Text, useColorModeValue, useDisclosure } from "@chakra-ui/react";
 
 // Utils
 import { ethers } from "ethers";
@@ -13,13 +13,12 @@ import { useQuery, gql } from "@apollo/client";
 import { NULL_ADDRESS, SC_ABI, SC_ADDRESS, SC_STAKING_ABI, SC_STAKING_ADDRESS } from "../../data/constants";
 import post from "../../data/325.json";
 
-// Components
-import Delegates from "./Delegates";
-import Stats from "./Stats";
-
 // Modal
 import DelegateModal from "../Modals/DelegateModal/DelegateModal";
 import ManualDelegate from "../Modals/ManualDelegate/ManualDelegate";
+import BottomButtons from "../BottomButtons/BottomButtons";
+import MainContainer from "../MainContainer/MainContainer";
+import Loader from "../Loader/Loader";
 
 /**
  * @name Delegate
@@ -74,7 +73,7 @@ const Delegate = ({ address, connector }) => {
 
     // ------------------ GRAPHQL ------------------
     const lowerCaseAddress = address.toLowerCase();
-    // 0x5cf1703a1c99a4b42eb056535840e93118177232
+    //
     const QUERY = gql`
         {
             account(id: "${lowerCaseAddress}") {
@@ -121,7 +120,7 @@ const Delegate = ({ address, connector }) => {
                     const stakeBigInt = BigInt(stake.totalStaked).toString();
                     const stakeEther = Number(ethers.utils.formatEther(stakeBigInt)).toFixed(0);
                     const delegatee = stake.delegatee?.id;
-                    // Buscar 0x y coger los 42 siguientes
+                    // Search 0x and cut the string
                     const delegateeAddress = delegatee?.match(/0x[a-fA-F0-9]{40}/g)[0] || NULL_ADDRESS;
                     auxStakes.push({ idStake: stake.id, totalStaked: stakeEther, delegatee: delegateeAddress });
                 });
@@ -129,7 +128,6 @@ const Delegate = ({ address, connector }) => {
                 setStakedBalance(totalStakedEther);
                 setStakedLoaded(true);
                 setStakes(auxStakes);
-                console.log("🚀 ~ file: Delegate.js:131 ~ calculateStaking ~ auxStakes:", auxStakes);
             } else {
                 setStakedBalance(0);
                 setStakedLoaded(true);
@@ -202,7 +200,7 @@ const Delegate = ({ address, connector }) => {
                 setSignedTContract(signedTContract);
                 setSignedTStaking(signedTStaking);
             } catch (error) {
-                console.error(error);
+                console.log("🚀 ~ file: Delegate.js:203 ~ getData ~ error:", error);
             } finally {
                 if (firstLoad) setFirstLoad(false);
                 setLoading(false);
@@ -237,58 +235,40 @@ const Delegate = ({ address, connector }) => {
                     shadow="dark-lg">
                     <Heading my={2}>Change your delegate</Heading>
                     <Text>Select a community member to represent you. You can change this at any time.</Text>
-                    {loading && firstLoad && (
-                        <>
-                            <Text textAlign="center" fontWeight="bold" my={4}>
-                                Loading...
-                            </Text>
-                            <Center>
-                                <Spinner size="lg" my={6} />
-                            </Center>
-                        </>
-                    )}
+
+                    {loading && firstLoad && <Loader />}
+
                     {data && (
-                        <Stack
-                            direction="column"
-                            spacing={4}
-                            my={4}
-                            border="1px"
+                        <MainContainer
                             borderColor={borderColor}
-                            rounded="md"
-                            shadow="sm">
-                            <Stats data={data} stakes={stakes} setSelectedStake={setSelectedStake} />
-                            {data.delegates !== "loading..." && (
-                                <Delegates delegators={data.delegators} handleClick={handleClick} />
-                            )}
-                        </Stack>
+                            data={data}
+                            stakes={stakes}
+                            setSelectedStake={setSelectedStake}
+                            handleClick={handleClick}
+                        />
                     )}
 
-                    <Center>
-                        <Stack direction="row" spacing={8}>
-                            <Button variant="ghost" onClick={handleManualDelegation}>
-                                Custom delegate
-                            </Button>
-                            <Button variant="ghost" onClick={disconnect}>
-                                Disconnect
-                            </Button>
-                        </Stack>
-                    </Center>
+                    <BottomButtons handleManualDelegation={handleManualDelegation} disconnect={disconnect} />
                 </Box>
             </Center>
+
             {selectedUser && (
                 <DelegateModal
                     isOpen={isOpen}
                     onClose={onClose}
                     selectedUser={selectedUser}
+                    selectedStake={selectedStake}
                     balance={selectedStake ? selectedStake.totalStaked : data.balance}
                     contract={selectedStake ? signedTStaking : signedTContract}
                 />
             )}
+
             {isOpenManual && (
                 <ManualDelegate
                     isOpen={isOpenManual}
                     onClose={onCloseManual}
                     address={address}
+                    selectedStake={selectedStake}
                     contract={selectedStake ? signedTStaking : signedTContract}
                 />
             )}
