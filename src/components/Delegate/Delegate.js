@@ -45,6 +45,7 @@ const Delegate = ({ address, connector }) => {
         votes: 0,
         delegates: "loading...",
         delegators: [],
+        isLoaded: false,
     });
 
     // ------------------ MODALs -------------------
@@ -73,7 +74,7 @@ const Delegate = ({ address, connector }) => {
 
     // ------------------ GRAPHQL ------------------
     const lowerCaseAddress = address.toLowerCase();
-    //
+
     const QUERY = gql`
         {
             account(id: "${lowerCaseAddress}") {
@@ -117,6 +118,7 @@ const Delegate = ({ address, connector }) => {
                 // Convert foreach stake to ether
                 const auxStakes = [];
                 stakes.forEach((stake) => {
+                    console.log("🚀 ~ file: Delegate.js:128 ~ stakes.forEach ~ stake:", stake);
                     const stakeBigInt = BigInt(stake.totalStaked).toString();
                     const stakeEther = Number(ethers.utils.formatEther(stakeBigInt)).toFixed(0);
                     const delegatee = stake.delegatee?.id;
@@ -196,6 +198,7 @@ const Delegate = ({ address, connector }) => {
                     stakedBalance: totalStakedBalance,
                     delegates,
                     delegators,
+                    isLoaded: true,
                 });
                 setSignedTContract(signedTContract);
                 setSignedTStaking(signedTStaking);
@@ -238,7 +241,7 @@ const Delegate = ({ address, connector }) => {
 
                     {loading && firstLoad && <Loader />}
 
-                    {data && (
+                    {data.isLoaded && (
                         <MainContainer
                             borderColor={borderColor}
                             data={data}

@@ -1,4 +1,4 @@
-import { Box, Stack, Text, useColorModeValue } from "@chakra-ui/react";
+import { Box, Center, Stack, Text, useColorModeValue } from "@chakra-ui/react";
 import { NULL_ADDRESS } from "../../data/constants";
 
 /**
@@ -15,23 +15,25 @@ import { NULL_ADDRESS } from "../../data/constants";
 const Liquid = ({ data, haveStakes }) => {
     const borderColor = useColorModeValue("blackAlpha.400", "whiteAlpha.400");
     return (
-        <Stack
-            direction="column"
-            border="1px"
-            p={2}
-            rounded="lg"
-            borderColor={borderColor}
-            spacing={0}
-            w={haveStakes ? "auto" : "25vw"}>
-            <Box>
-                <Text fontWeight="bold">Liquid T</Text>
-                <Text>{data.balance}</Text>
-            </Box>
-            <Box>
-                <Text fontWeight="bold">Delegatee</Text>
-                {data.delegates === NULL_ADDRESS ? <Text>Not delegated</Text> : <Text>{data.delegates}</Text>}
-            </Box>
-        </Stack>
+        <Center display={haveStakes ? "unset" : "flex"}>
+            <Stack
+                direction="column"
+                border="1px"
+                p={2}
+                rounded="lg"
+                borderColor={borderColor}
+                spacing={0}
+                w={haveStakes ? "auto" : "25vw"}>
+                <Box>
+                    <Text fontWeight="bold">Liquid T</Text>
+                    <Text>{data.balance}</Text>
+                </Box>
+                <Box>
+                    <Text fontWeight="bold">Delegatee</Text>
+                    {data.delegates === NULL_ADDRESS ? <Text>Not delegated</Text> : <Text>{data.delegates}</Text>}
+                </Box>
+            </Stack>
+        </Center>
     );
 };
 
