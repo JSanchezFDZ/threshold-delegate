@@ -51,6 +51,7 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
     const checkAddress = (address) => {
         try {
             const check = ethers.utils.isAddress(address);
+            console.log("🚀 ~ file: ManualDelegate.js:54 ~ checkAddress ~ check:", check)
             setIsValidAddress(check);
         } catch (error) {
             setIsValidAddress(false);
@@ -58,15 +59,19 @@ const ManualDelegate = ({ onClose, isOpen, address, selectedStake, contract }) =
     };
 
     // -------------------------- Handle functions -------------------------- //
+    // Manual input
     const handleInput = (e) => {
         setDelegateAddress(e.target.value);
         checkAddress(e.target.value);
     };
 
+    // Delegate to myself
     const handleDelegateMyself = () => {
         setDelegateAddress(address);
+        checkAddress(address);
     };
 
+    // Close modal and reset states
     const handleClose = () => {
         setDelegateAddress("");
         setIsValidAddress(false);
